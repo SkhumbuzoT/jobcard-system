@@ -1,666 +1,163 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Field Job Card Feedback</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        .header .badge {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            display: inline-block;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        .card-header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 15px 25px;
-        }
-        
-        .card-header h2 {
-            font-size: 1.3em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .card-body {
-            padding: 25px;
-        }
-        
-        .info-section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-left: 4px solid #2a5298;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .info-label {
-            font-size: 0.8em;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .info-value {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #1e3c72;
-            word-break: break-word;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        
-        .form-group {
-            margin-bottom: 5px;
-        }
-        
-        .form-group.full-width {
-            grid-column: span 2;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-            font-size: 0.9em;
-        }
-        
-        .required::after {
-            content: " *";
-            color: #dc3545;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-            background: white;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #2a5298;
-        }
-        
-        input[readonly] {
-            background: #f8f9fa;
-            cursor: not-allowed;
-        }
-        
-        .image-upload-area {
-            border: 2px dashed #2a5298;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            background: #f8f9ff;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .image-upload-area:hover {
-            background: #e8ecff;
-            border-color: #1e3c72;
-        }
-        
-        .image-upload-area input {
-            display: none;
-        }
-        
-        .image-preview {
-            margin-top: 15px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        
-        .preview-item {
-            position: relative;
-        }
-        
-        .preview-item img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid #e0e0e0;
-        }
-        
-        .remove-image {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-        
-        .button {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            width: 100%;
-        }
-        
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(30, 60, 114, 0.4);
-        }
-        
-        .button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        
-        .status {
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            display: none;
-        }
-        
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-        
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #2a5298;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 10px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .section-divider {
-            margin: 25px 0 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #2a5298;
-            font-weight: 600;
-            color: #1e3c72;
-        }
-        
-        .helper-text {
-            font-size: 0.8em;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-group.full-width {
-                grid-column: span 1;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📱 Field Job Card Feedback</h1>
-            <div class="badge">Installer: BRUCE MHLANGA • LIGHTUP ENTERPRISE</div>
-        </div>
-        
-        <!-- Search/Select Job Card -->
-        <div class="card">
-            <div class="card-header">
-                <h2>🔍 Select Job Card</h2>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label class="required">Contract Account Number</label>
-                    <input type="text" id="accountSearch" placeholder="Enter account number to load job card..." list="accountList">
-                    <datalist id="accountList">
-                        <!-- This will be populated from Google Sheets -->
-                        <option value="553859972">17 WABOOM STREET</option>
-                        <option value="556117129">4 VISTA PLACE</option>
-                        <option value="554169523">11 SWARTHAAK STREET</option>
-                    </datalist>
-                    <button class="button" style="margin-top: 10px; padding: 10px;" onclick="loadJobCard()">Load Job Card</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Job Card Information (Pre-filled from system) -->
-        <div class="card" id="jobCardInfo" style="display: none;">
-            <div class="card-header">
-                <h2>📋 Job Card Details</h2>
-            </div>
-            <div class="card-body">
-                <div class="info-section">
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <span class="info-label">Installation Code</span>
-                            <span class="info-value" id="displayInstallationCode">T0IQ0333041000030210000000</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">SG ID</span>
-                            <span class="info-value" id="displaySgId">T0IQ0333041000030210000000</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Address</span>
-                            <span class="info-value" id="displayAddress">17 WABOOM STREET, RANDPARKRIF EXT.41</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Device</span>
-                            <span class="info-value" id="displayDevice">48001076024</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Old Meter Reading</span>
-                            <span class="info-value" id="displayOldReading">-</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Field Feedback Form -->
-        <div class="card">
-            <div class="card-header">
-                <h2>📝 Field Feedback</h2>
-            </div>
-            <div class="card-body">
-                <form id="feedbackForm">
-                    <!-- Hidden fields -->
-                    <input type="hidden" id="installationCode" name="Installation_code">
-                    <input type="hidden" id="sgId" name="SG ID">
-                    <input type="hidden" id="houseNo" name="House No">
-                    <input type="hidden" id="street" name="Street">
-                    <input type="hidden" id="city" name="City">
-                    <input type="hidden" id="device" name="Device">
-                    <input type="hidden" id="contractAccount" name="Contract Account">
-                    <input type="hidden" id="oldMeterReadings" name="Old Meter Readings">
-                    
-                    <!-- Field Input Section -->
-                    <div class="section-divider">⬇️ FIELD FEEDBACK - TO BE COMPLETED</div>
-                    
-                    <div class="form-grid">
-                        <!-- New Meter Number -->
-                        <div class="form-group">
-                            <label class="required">New Meter Number</label>
-                            <input type="text" id="newMeterNumber" name="New Meter Number" required placeholder="Enter new meter number">
-                        </div>
-                        
-                        <!-- Installation Date -->
-                        <div class="form-group">
-                            <label class="required">Installation Date</label>
-                            <input type="date" id="installationDate" name="Installation Date" required>
-                        </div>
-                        
-                        <!-- Status -->
-                        <div class="form-group full-width">
-                            <label class="required">Status / Comments</label>
-                            <select id="status" name="Status" required onchange="toggleCustomComment()">
-                                <option value="">Select status...</option>
-                                <option value="Cut Off">Cut Off</option>
-                                <option value="New 1ph postpaid smart meter installed">New 1ph postpaid smart meter installed</option>
-                                <option value="New 3ph postpaid smart meter installed">New 3ph postpaid smart meter installed</option>
-                                <option value="Meter burnt">Meter burnt</option>
-                                <option value="Meter faulty">Meter faulty</option>
-                                <option value="No access">No access</option>
-                                <option value="Custom">+ Add custom comment</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Custom Comment (shown when Custom selected) -->
-                        <div class="form-group full-width" id="customCommentGroup" style="display: none;">
-                            <label>Custom Comment</label>
-                            <textarea id="customComment" rows="3" placeholder="Enter detailed comment..."></textarea>
-                        </div>
-                        
-                        <!-- Old Meter Image -->
-                        <div class="form-group full-width">
-                            <label>📸 Old Meter Image (Google Drive)</label>
-                            <div class="image-upload-area" onclick="document.getElementById('oldImageInput').click()">
-                                <input type="file" id="oldImageInput" accept="image/*" onchange="handleImageUpload(this, 'old')">
-                                <div>Click to upload or drag & drop</div>
-                                <div class="helper-text">Photo of the old meter installation</div>
-                            </div>
-                            <input type="hidden" id="oldMeterImage" name="OldMeterImage">
-                            <div class="image-preview" id="oldImagePreview"></div>
-                        </div>
-                        
-                        <!-- New Meter Image -->
-                        <div class="form-group full-width">
-                            <label>📸 New Meter Image (Google Drive)</label>
-                            <div class="image-upload-area" onclick="document.getElementById('newImageInput').click()">
-                                <input type="file" id="newImageInput" accept="image/*" onchange="handleImageUpload(this, 'new')">
-                                <div>Click to upload or drag & drop</div>
-                                <div class="helper-text">Photo of the new meter installation</div>
-                            </div>
-                            <input type="hidden" id="newMeterImage" name="NewMeterImage">
-                            <div class="image-preview" id="newImagePreview"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Submit Button -->
-                    <button type="submit" class="button" id="submitBtn" style="margin-top: 20px;">
-                        <span id="submitText">Submit Field Feedback</span>
-                        <span id="loadingSpinner" class="loading" style="display: none;"></span>
-                    </button>
-                    
-                    <div id="statusMessage" class="status"></div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Recent Submissions -->
-        <div class="card">
-            <div class="card-header">
-                <h2>🕒 Recent Field Updates</h2>
-            </div>
-            <div class="card-body">
-                <div style="overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #f0f4f8;">
-                                <th style="padding: 10px; text-align: left;">Account</th>
-                                <th style="padding: 10px; text-align: left;">New Meter</th>
-                                <th style="padding: 10px; text-align: left;">Date</th>
-                                <th style="padding: 10px; text-align: left;">Status</th>
-                                <th style="padding: 10px; text-align: left;">Images</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentSubmissions">
-                            <tr>
-                                <td style="padding: 10px;" colspan="5">Loading...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+# jobcard_web_interface.py
+import streamlit as st
+import pandas as pd
+from datetime import datetime
+import os
+import tempfile
+from pathlib import Path
+import sys
+
+# Import your existing processor
+from jobcard_processor import UnifiedJobCardProcessor, CONFIG
+
+st.set_page_config(page_title="Job Card Creator", page_icon="📋", layout="wide")
+
+def main():
+    st.title("📋 Job Card Creation Interface")
+    st.markdown("Fill in the details below to generate a job card")
     
-    <script>
-        // Google Apps Script URL (replace with your deployed URL)
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBwLdC3sV5acptkqVXGRIPjXRfinvlD2caDgBiLz1os5Aj2qKzJ_PlbnTit5fnMP58qQ/exec';
+    # Create two columns for layout
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Customer & Meter Details")
         
-        // Mock data for demonstration
-        const jobCardData = {
-            "553859972": {
-                installationCode: "T0IQ0333041000030210000000",
-                sgId: "T0IQ0333041000030210000000",
-                houseNo: "17",
-                street: "WABOOM STREET",
-                city: "RANDPARKRIF EXT.41",
-                device: "48001076024",
-                oldReading: ""
-            },
-            "556117129": {
-                installationCode: "TOIQ0332005000004350000210",
-                sgId: "TOIQ0332005000004350000210",
-                houseNo: "4",
-                street: "VISTA PLACE",
-                city: "RANDPARK EXT.5",
-                device: "48000317544",
-                oldReading: ""
-            },
-            "554169523": {
-                installationCode: "T0IQ0333041000030740000000",
-                sgId: "T0IQ0333041000030740000000",
-                houseNo: "11",
-                street: "SWARTHAAK STREET",
-                city: "RANDPARKRIF EXT.41",
-                device: "48000611821",
-                oldReading: ""
-            }
-        };
+        # Customer details
+        account_number = st.text_input("Contract Account Number*", 
+                                      help="Enter the customer's account number")
+        customer_name = st.text_input("Customer Name*")
+        id_number = st.text_input("ID Number")
         
-        function loadJobCard() {
-            const account = document.getElementById('accountSearch').value;
-            const data = jobCardData[account];
+        # Address
+        st.markdown("**Address**")
+        house_no = st.text_input("House Number")
+        street = st.text_input("Street")
+        complex_name = st.text_input("Complex (if applicable)")
+        suburb = st.text_input("Suburb/City")
+        
+    with col2:
+        st.subheader("Meter Information")
+        
+        # The 6 fields you mentioned
+        new_meter_number = st.text_input("1. New Meter Number*", 
+                                        help="Enter the new meter number")
+        old_meter_reading = st.text_input("2. Old Meter Reading*", 
+                                         help="Enter the old meter reading")
+        installation_date = st.date_input("3. Installation Date*", 
+                                         value=datetime.now())
+        status = st.selectbox("4. Status*", 
+                             ["Completed", "Pending", "Rescheduled", "Cancelled"])
+        
+        st.markdown("---")
+        st.subheader("Meter Photos (Google Drive URLs)")
+        
+        # Image URLs
+        old_meter_image = st.text_input("5. Old Meter Image URL/ID*", 
+                                       help="Google Drive file ID or link")
+        new_meter_image = st.text_input("6. New Meter Image URL/ID*", 
+                                       help="Google Drive file ID or link")
+        
+        # Helper for Google Drive IDs
+        st.caption("ℹ️ Enter just the file ID from Google Drive share link")
+        st.caption("Example: `1abc123...` from drive.google.com/file/d/1abc123.../view")
+    
+    # Additional fields
+    with st.expander("Additional Information (Optional)"):
+        col3, col4 = st.columns(2)
+        with col3:
+            meter_factor = st.text_input("Meter Factor", value="1")
+            register = st.text_input("Register", value="1")
+            digits = st.text_input("Number of Digits", value="5")
+        with col4:
+            device = st.text_input("Device Type", value="METER")
+            comments = st.text_area("Additional Comments")
+    
+    # Preview and Submit
+    st.markdown("---")
+    
+    if st.button("🚀 Generate Job Card", type="primary", use_container_width=True):
+        if not all([account_number, customer_name, new_meter_number, old_meter_reading]):
+            st.error("Please fill in all required fields (*)")
+        else:
+            generate_job_card({
+                'Contract Account': account_number,
+                'Customer Name': customer_name,
+                'ID Number': id_number,
+                'House No': house_no,
+                'Street': street,
+                'Complex': complex_name,
+                'City': suburb,
+                'New Meter Number': new_meter_number,
+                'Old Meter Readings': old_meter_reading,
+                'Installation Date': installation_date.strftime("%Y-%m-%d"),
+                'Status': status,
+                'OldMeterImage': old_meter_image,
+                'NewMeterImage': new_meter_image,
+                'Meter Factor': meter_factor,
+                'Register': register,
+                'Digits': digits,
+                'Device': device,
+                'Comment': comments
+            })
+
+def generate_job_card(data):
+    """Generate job card from form data"""
+    with st.spinner("Creating job card..."):
+        try:
+            # Create a temporary Excel file with the single row
+            temp_df = pd.DataFrame([data])
+            temp_excel = tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx')
+            temp_df.to_excel(temp_excel.name, index=False)
             
-            if (data) {
-                // Show job card info section
-                document.getElementById('jobCardInfo').style.display = 'block';
-                
-                // Display job card details
-                document.getElementById('displayInstallationCode').textContent = data.installationCode;
-                document.getElementById('displaySgId').textContent = data.sgId;
-                document.getElementById('displayAddress').textContent = `${data.houseNo} ${data.street}, ${data.city}`;
-                document.getElementById('displayDevice').textContent = data.device;
-                document.getElementById('displayOldReading').textContent = data.oldReading || 'Not recorded';
-                
-                // Set hidden form fields
-                document.getElementById('installationCode').value = data.installationCode;
-                document.getElementById('sgId').value = data.sgId;
-                document.getElementById('houseNo').value = data.houseNo;
-                document.getElementById('street').value = data.street;
-                document.getElementById('city').value = data.city;
-                document.getElementById('device').value = data.device;
-                document.getElementById('contractAccount').value = account;
-                document.getElementById('oldMeterReadings').value = data.oldReading;
-                
-                // Scroll to feedback form
-                document.getElementById('feedbackForm').scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert('Account not found');
-            }
-        }
-        
-        function toggleCustomComment() {
-            const status = document.getElementById('status');
-            const customGroup = document.getElementById('customCommentGroup');
-            customGroup.style.display = status.value === 'Custom' ? 'block' : 'none';
-        }
-        
-        async function handleImageUpload(input, type) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    // Show preview
-                    const previewDiv = document.getElementById(`${type}ImagePreview`);
-                    previewDiv.innerHTML = `
-                        <div class="preview-item">
-                            <img src="${e.target.result}" alt="Preview">
-                            <button class="remove-image" onclick="removeImage('${type}')">×</button>
-                        </div>
-                    `;
-                };
-                
-                reader.readAsDataURL(file);
-                
-                // Here you would upload to Google Drive and get file ID
-                // For now, we'll simulate with a placeholder
-                document.getElementById(`${type}MeterImage`).value = 'PENDING_UPLOAD_' + Date.now();
-            }
-        }
-        
-        function removeImage(type) {
-            document.getElementById(`${type}ImagePreview`).innerHTML = '';
-            document.getElementById(`${type}ImageInput`).value = '';
-            document.getElementById(`${type}MeterImage`).value = '';
-        }
-        
-        document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+            # Override the spreadsheet path temporarily
+            original_spreadsheet = CONFIG['spreadsheet']
+            CONFIG['spreadsheet'] = temp_excel.name
             
-            const submitBtn = document.getElementById('submitBtn');
-            const submitText = document.getElementById('submitText');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            const statusDiv = document.getElementById('statusMessage');
+            # Run the processor
+            processor = UnifiedJobCardProcessor()
             
-            // Disable button
-            submitBtn.disabled = true;
-            submitText.style.opacity = '0.7';
-            loadingSpinner.style.display = 'inline-block';
+            # We need to modify the processor to handle single rows
+            # For now, let's capture output
+            import io
+            from contextlib import redirect_stdout
             
-            // Get form data
-            const formData = {
-                Installation_code: document.getElementById('installationCode').value,
-                SG_ID: document.getElementById('sgId').value,
-                House_No: document.getElementById('houseNo').value,
-                Street: document.getElementById('street').value,
-                City: document.getElementById('city').value,
-                Device: document.getElementById('device').value,
-                Contract_Account: document.getElementById('contractAccount').value,
-                Old_Meter_Readings: document.getElementById('oldMeterReadings').value,
-                New_Meter_Number: document.getElementById('newMeterNumber').value,
-                Installation_Date: document.getElementById('installationDate').value,
-                Status: document.getElementById('status').value === 'Custom' ? 
-                       document.getElementById('customComment').value : 
-                       document.getElementById('status').value,
-                OldMeterImage: document.getElementById('oldMeterImage').value,
-                NewMeterImage: document.getElementById('newMeterImage').value,
-                Timestamp: new Date().toISOString()
-            };
+            f = io.StringIO()
+            with redirect_stdout(f):
+                processor.process_all()
             
-            try {
-                // Submit to Google Sheets
-                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(formData)
-                });
+            # Clean up
+            os.unlink(temp_excel.name)
+            CONFIG['spreadsheet'] = original_spreadsheet
+            
+            # Show success
+            st.success("✅ Job card created successfully!")
+            
+            # Find the generated file
+            account = data['Contract Account']
+            final_path = os.path.join(CONFIG['output_base'], 
+                                     CONFIG['final_folder'], 
+                                     f"FINAL_JOB_CARD_{account}.pdf")
+            
+            if os.path.exists(final_path):
+                with open(final_path, "rb") as file:
+                    st.download_button(
+                        label="📥 Download Job Card PDF",
+                        data=file,
+                        file_name=f"JOB_CARD_{account}.pdf",
+                        mime="application/pdf"
+                    )
                 
-                statusDiv.className = 'status success';
-                statusDiv.innerHTML = '✅ Field feedback submitted successfully!';
+                # Show preview button
+                st.info(f"📁 File saved to: {final_path}")
+            else:
+                st.warning("File generated but not found for download. Check the output folder.")
+            
+            # Show the processing output
+            with st.expander("View processing details"):
+                st.text(f.getvalue())
                 
-                // Reset only the feedback fields
-                document.getElementById('newMeterNumber').value = '';
-                document.getElementById('installationDate').value = '';
-                document.getElementById('status').value = '';
-                document.getElementById('customComment').value = '';
-                document.getElementById('customCommentGroup').style.display = 'none';
-                removeImage('old');
-                removeImage('new');
-                
-                // Refresh recent submissions
-                loadRecentSubmissions();
-                
-            } catch (error) {
-                statusDiv.className = 'status error';
-                statusDiv.innerHTML = '❌ Error submitting feedback. Please try again.';
-                console.error('Error:', error);
-            } finally {
-                submitBtn.disabled = false;
-                submitText.style.opacity = '1';
-                loadingSpinner.style.display = 'none';
-            }
-        });
-        
-        function loadRecentSubmissions() {
-            // This would fetch from Google Sheets
-            const tbody = document.getElementById('recentSubmissions');
-            tbody.innerHTML = `
-                <tr>
-                    <td style="padding: 10px;">554169523</td>
-                    <td style="padding: 10px;">14521335068</td>
-                    <td style="padding: 10px;">2026-02-20</td>
-                    <td style="padding: 10px;">New 1ph postpaid smart meter installed. Found old meter burnt, removed.</td>
-                    <td style="padding: 10px;">📸 2 images</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px;">553859972</td>
-                    <td style="padding: 10px;"></td>
-                    <td style="padding: 10px;">2026-02-20</td>
-                    <td style="padding: 10px;">Cut Off</td>
-                    <td style="padding: 10px;">📸 1 image</td>
-                </tr>
-            `;
-        }
-        
-        // Load recent submissions on page load
-        loadRecentSubmissions();
-    </script>
-</body>
-</html>
+        except Exception as e:
+            st.error(f"Error generating job card: {str(e)}")
+
+if __name__ == "__main__":
+    main()
